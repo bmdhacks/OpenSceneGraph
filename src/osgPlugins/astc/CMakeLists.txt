@@ -1,0 +1,13 @@
+SET(TARGET_SRC ReaderWriterASTC.cpp)
+
+# Find astcenc library
+FIND_LIBRARY(ASTCENC_LIBRARY astcenc)
+FIND_PATH(ASTCENC_INCLUDE_DIR astcenc.h)
+
+IF(ASTCENC_LIBRARY AND ASTCENC_INCLUDE_DIR)
+    SET(TARGET_EXTERNAL_LIBRARIES ${ASTCENC_LIBRARY})
+    INCLUDE_DIRECTORIES(${ASTCENC_INCLUDE_DIR})
+    SETUP_PLUGIN(astc)
+ELSE()
+    MESSAGE("Warning: Could not find astcenc library - ASTC plugin will not be built")
+ENDIF()

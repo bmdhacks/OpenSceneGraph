@@ -261,6 +261,12 @@ struct DXT1TexelsBlock
 #define FOURCC_ATI2  (MAKEFOURCC('A','T','I','2'))
 
 /*
+* FOURCC codes for ASTC and ETC2 compressed-texture pixel formats
+*/
+#define FOURCC_ASTC  (MAKEFOURCC('A','S','T','C'))
+#define FOURCC_ETC2  (MAKEFOURCC('E','T','C','2'))
+
+/*
 * FOURCC codes for DX10 files
 */
 #define FOURCC_DX10  (MAKEFOURCC('D','X','1','0'))
@@ -382,6 +388,49 @@ typedef enum OSG_DXGI_FORMAT {
   OSG_DXGI_FORMAT_P8                          = 113,
   OSG_DXGI_FORMAT_A8P8                        = 114,
   OSG_DXGI_FORMAT_B4G4R4A4_UNORM              = 115,
+  
+  // ASTC format extensions
+  OSG_DXGI_FORMAT_ASTC_4x4_UNORM              = 134,
+  OSG_DXGI_FORMAT_ASTC_4x4_UNORM_SRGB         = 135,
+  OSG_DXGI_FORMAT_ASTC_5x4_UNORM              = 136,
+  OSG_DXGI_FORMAT_ASTC_5x4_UNORM_SRGB         = 137,
+  OSG_DXGI_FORMAT_ASTC_5x5_UNORM              = 138,
+  OSG_DXGI_FORMAT_ASTC_5x5_UNORM_SRGB         = 139,
+  OSG_DXGI_FORMAT_ASTC_6x5_UNORM              = 140,
+  OSG_DXGI_FORMAT_ASTC_6x5_UNORM_SRGB         = 141,
+  OSG_DXGI_FORMAT_ASTC_6x6_UNORM              = 142,
+  OSG_DXGI_FORMAT_ASTC_6x6_UNORM_SRGB         = 143,
+  OSG_DXGI_FORMAT_ASTC_8x5_UNORM              = 144,
+  OSG_DXGI_FORMAT_ASTC_8x5_UNORM_SRGB         = 145,
+  OSG_DXGI_FORMAT_ASTC_8x6_UNORM              = 146,
+  OSG_DXGI_FORMAT_ASTC_8x6_UNORM_SRGB         = 147,
+  OSG_DXGI_FORMAT_ASTC_8x8_UNORM              = 148,
+  OSG_DXGI_FORMAT_ASTC_8x8_UNORM_SRGB         = 149,
+  OSG_DXGI_FORMAT_ASTC_10x5_UNORM             = 150,
+  OSG_DXGI_FORMAT_ASTC_10x5_UNORM_SRGB        = 151,
+  OSG_DXGI_FORMAT_ASTC_10x6_UNORM             = 152,
+  OSG_DXGI_FORMAT_ASTC_10x6_UNORM_SRGB        = 153,
+  OSG_DXGI_FORMAT_ASTC_10x8_UNORM             = 154,
+  OSG_DXGI_FORMAT_ASTC_10x8_UNORM_SRGB        = 155,
+  OSG_DXGI_FORMAT_ASTC_10x10_UNORM            = 156,
+  OSG_DXGI_FORMAT_ASTC_10x10_UNORM_SRGB       = 157,
+  OSG_DXGI_FORMAT_ASTC_12x10_UNORM            = 158,
+  OSG_DXGI_FORMAT_ASTC_12x10_UNORM_SRGB       = 159,
+  OSG_DXGI_FORMAT_ASTC_12x12_UNORM            = 160,
+  OSG_DXGI_FORMAT_ASTC_12x12_UNORM_SRGB       = 161,
+  
+  // ETC2/EAC format extensions
+  OSG_DXGI_FORMAT_ETC2_RGB8_UNORM             = 162,
+  OSG_DXGI_FORMAT_ETC2_RGB8_UNORM_SRGB        = 163,
+  OSG_DXGI_FORMAT_ETC2_RGB8A1_UNORM           = 164,
+  OSG_DXGI_FORMAT_ETC2_RGB8A1_UNORM_SRGB      = 165,
+  OSG_DXGI_FORMAT_ETC2_RGBA8_UNORM            = 166,
+  OSG_DXGI_FORMAT_ETC2_RGBA8_UNORM_SRGB       = 167,
+  OSG_DXGI_FORMAT_EAC_R11_UNORM               = 168,
+  OSG_DXGI_FORMAT_EAC_R11_SNORM               = 169,
+  OSG_DXGI_FORMAT_EAC_RG11_UNORM              = 170,
+  OSG_DXGI_FORMAT_EAC_RG11_SNORM              = 171,
+  
   OSG_DXGI_FORMAT_FORCE_UINT                  = 0xffffffffUL
 } OSG_DXGI_FORMAT;
 
@@ -522,6 +571,24 @@ osg::Image* ReadDDSFile(std::istream& _istream, bool flipDDSRead)
             internalFormat = GL_COMPRESSED_RED_GREEN_RGTC2_EXT;
             pixelFormat    = GL_COMPRESSED_RED_GREEN_RGTC2_EXT;
             break;
+        case FOURCC_BC5U:
+            OSG_INFO << "ReadDDSFile info : format = BC5U" << std::endl;
+            internalFormat = GL_COMPRESSED_RED_GREEN_RGTC2_EXT;
+            pixelFormat    = GL_COMPRESSED_RED_GREEN_RGTC2_EXT;
+            break;
+        case FOURCC_BC5S:
+            OSG_INFO << "ReadDDSFile info : format = BC5S" << std::endl;
+            internalFormat = GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT;
+            pixelFormat    = GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT;
+            break;
+        case FOURCC_ASTC:
+            OSG_INFO << "ReadDDSFile info : format = ASTC (requires DX10 header)" << std::endl;
+            OSG_WARN << "ReadDDSFile warning: ASTC format requires DX10 header for block size specification" << std::endl;
+            return NULL;
+        case FOURCC_ETC2:
+            OSG_INFO << "ReadDDSFile info : format = ETC2 (requires DX10 header)" << std::endl;
+            OSG_WARN << "ReadDDSFile warning: ETC2 format requires DX10 header for variant specification" << std::endl;
+            return NULL;
         case 0x00000024: // A16B16G16R16
             OSG_INFO << "ReadDDSFile info : format = A16B16G16R16" << std::endl;
             internalFormat = GL_RGBA;
@@ -770,6 +837,185 @@ osg::Image* ReadDDSFile(std::istream& _istream, bool flipDDSRead)
                     dataType       = GL_SHORT;
                     break;
 
+<<<<<<< HEAD
+=======
+                case OSG_DXGI_FORMAT_BC4_UNORM:
+                    internalFormat = GL_COMPRESSED_RED_RGTC1_EXT;
+                    pixelFormat    = GL_COMPRESSED_RED_RGTC1_EXT;
+                    break;
+
+                case OSG_DXGI_FORMAT_BC4_SNORM:
+                    internalFormat = GL_COMPRESSED_SIGNED_RED_RGTC1_EXT;
+                    pixelFormat    = GL_COMPRESSED_SIGNED_RED_RGTC1_EXT;
+                    break;
+
+                case OSG_DXGI_FORMAT_BC5_UNORM:
+                    internalFormat = GL_COMPRESSED_RED_GREEN_RGTC2_EXT;
+                    pixelFormat    = GL_COMPRESSED_RED_GREEN_RGTC2_EXT;
+                    break;
+
+                case OSG_DXGI_FORMAT_BC5_SNORM:
+                    internalFormat = GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT;
+                    pixelFormat    = GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT;
+                    break;
+
+                // ASTC format support
+                case OSG_DXGI_FORMAT_ASTC_4x4_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_4x4_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_5x4_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_5x4_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_5x4_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_5x4_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_5x5_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_5x5_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_5x5_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_5x5_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_6x5_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_6x5_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_6x5_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_6x5_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_6x6_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_6x6_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_8x5_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_8x5_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_8x5_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_8x5_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_8x6_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_8x6_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_8x6_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_8x6_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_8x8_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_8x8_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_8x8_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_8x8_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_10x5_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_10x5_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_10x5_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_10x5_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_10x6_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_10x6_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_10x6_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_10x6_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_10x8_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_10x8_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_10x8_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_10x8_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_10x10_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_10x10_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_10x10_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_10x10_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_12x10_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_12x10_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_12x10_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_12x10_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_12x12_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA_ASTC_12x12_KHR;
+                    pixelFormat    = GL_COMPRESSED_RGBA_ASTC_12x12_KHR;
+                    break;
+                case OSG_DXGI_FORMAT_ASTC_12x12_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
+                    break;
+
+                // ETC2/EAC format support
+                case OSG_DXGI_FORMAT_ETC2_RGB8_UNORM:
+                    internalFormat = GL_COMPRESSED_RGB8_ETC2;
+                    pixelFormat    = GL_COMPRESSED_RGB8_ETC2;
+                    break;
+                case OSG_DXGI_FORMAT_ETC2_RGB8_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ETC2;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ETC2;
+                    break;
+                case OSG_DXGI_FORMAT_ETC2_RGB8A1_UNORM:
+                    internalFormat = GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+                    pixelFormat    = GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+                    break;
+                case OSG_DXGI_FORMAT_ETC2_RGB8A1_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+                    break;
+                case OSG_DXGI_FORMAT_ETC2_RGBA8_UNORM:
+                    internalFormat = GL_COMPRESSED_RGBA8_ETC2_EAC;
+                    pixelFormat    = GL_COMPRESSED_RGBA8_ETC2_EAC;
+                    break;
+                case OSG_DXGI_FORMAT_ETC2_RGBA8_UNORM_SRGB:
+                    internalFormat = GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC;
+                    pixelFormat    = GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC;
+                    break;
+                case OSG_DXGI_FORMAT_EAC_R11_UNORM:
+                    internalFormat = GL_COMPRESSED_R11_EAC;
+                    pixelFormat    = GL_COMPRESSED_R11_EAC;
+                    break;
+                case OSG_DXGI_FORMAT_EAC_R11_SNORM:
+                    internalFormat = GL_COMPRESSED_SIGNED_R11_EAC;
+                    pixelFormat    = GL_COMPRESSED_SIGNED_R11_EAC;
+                    break;
+                case OSG_DXGI_FORMAT_EAC_RG11_UNORM:
+                    internalFormat = GL_COMPRESSED_RG11_EAC;
+                    pixelFormat    = GL_COMPRESSED_RG11_EAC;
+                    break;
+                case OSG_DXGI_FORMAT_EAC_RG11_SNORM:
+                    internalFormat = GL_COMPRESSED_SIGNED_RG11_EAC;
+                    pixelFormat    = GL_COMPRESSED_SIGNED_RG11_EAC;
+                    break;
+
+>>>>>>> da6bc4956 (astc support)
                 default:
                     OSG_WARN << "ReadDDSFile warning: unhandled DX10 pixel format 0x"
                              << std::hex << std::setw(8) << std::setfill('0')
@@ -1278,6 +1524,59 @@ bool WriteDDSFile(const osg::Image *img, std::ostream& fout, bool autoFlipDDSWri
             SD_flags |= DDSD_LINEARSIZE;
         }
         break;
+        
+    // ASTC formats - use DX10 header
+    case GL_COMPRESSED_RGBA_ASTC_4x4_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_5x4_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_5x5_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_6x5_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_6x6_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_8x5_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_8x6_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_8x8_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_10x5_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_10x6_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_10x8_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_10x10_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_12x10_KHR:
+    case GL_COMPRESSED_RGBA_ASTC_12x12_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
+        {
+            OSG_WARN << "WriteDDSFile warning: ASTC format requires DX10 header extension, not yet implemented for writing" << std::endl;
+            return false;
+        }
+        break;
+        
+    // ETC2/EAC formats - use DX10 header
+    case GL_COMPRESSED_RGB8_ETC2:
+    case GL_COMPRESSED_SRGB8_ETC2:
+    case GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+    case GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
+    case GL_COMPRESSED_RGBA8_ETC2_EAC:
+    case GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
+    case GL_COMPRESSED_R11_EAC:
+    case GL_COMPRESSED_SIGNED_R11_EAC:
+    case GL_COMPRESSED_RG11_EAC:
+    case GL_COMPRESSED_SIGNED_RG11_EAC:
+        {
+            OSG_WARN << "WriteDDSFile warning: ETC2/EAC format requires DX10 header extension, not yet implemented for writing" << std::endl;
+            return false;
+        }
+        break;
+        
     default:
         OSG_WARN<<"Warning:: unhandled pixel format in image, file cannot be written."<<std::endl;
         return false;
